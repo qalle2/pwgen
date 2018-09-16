@@ -3,6 +3,8 @@ Password generator in Python.
 Uses the cryptographically strong [``secrets``](http://docs.python.org/3/library/secrets.html) module.
 Developed with Python 3 under 64-bit Windows.
 
+For help, use the `-h` argument: `python pwgen.py -h`
+
 ## Example 1
 
 Generate four ASCII passwords of length 10 with at least one uppercase letter, lowercase letter, digit and punctuation character in each one.
