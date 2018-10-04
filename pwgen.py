@@ -89,7 +89,6 @@ def parse_unicode_argument(opts):
 def parse_arguments():
     longOptions = [
         "character-sets=",
-        "length=",
         "all-sets",
         "no-repeat",
         "group-size=",
@@ -103,34 +102,42 @@ def parse_arguments():
         "alphabet",
     ]
     try:
-        (opts, args) = getopt.getopt(sys.argv[1:], "c:l:arg:n:", longOptions)
+        (opts, args) = getopt.getopt(sys.argv[1:], "c:arg:n:", longOptions)
     except getopt.GetoptError:
         exit("Error: unrecognized argument. See the readme file.")
-    if len(args) > 0:
-        exit("Error: invalid number of arguments. See the readme file.")
 
     opts = dict(opts)
 
-    # parse boolean arguments
+    # parse boolean options
     allSets = "-a" in opts or "--all-sets" in opts
     noRepeat = "-r" in opts or "--no-repeat" in opts
     printSettings = "--settings" in opts
     printAlphabet = "--alphabet" in opts
 
-    # parse integer arguments
-    length = parse_integer_argument(opts, "--length", "-l", 1, 16)
+    # parse integer options
     groupSize = parse_integer_argument(opts, "--group-size", "-g", 0, 0)
     number = parse_integer_argument(opts, "--number", "-n", 1, 1)
 
-    # parse string arguments
+    # parse string options
     charsets = parse_string_argument(opts, "--character-sets", "-c", "uldp")
     uppercase = parse_string_argument(opts, "--uppercase", None, string.ascii_uppercase)
     lowercase = parse_string_argument(opts, "--lowercase", None, string.ascii_lowercase)
     digits = parse_string_argument(opts, "--digits", None, string.digits)
     punctuation = parse_string_argument(opts, "--punctuation", None, string.punctuation)
 
-    # parse Unicode argument
+    # parse Unicode option
     unicode = parse_unicode_argument(opts)
+
+    # parse length
+    if len(args) != 1:
+        exit("Error: invalid number of arguments. See the readme file.")
+    length = args[0]
+    try:
+        length = int(length, 10)
+        if length < 1:
+            raise ValueError
+    except ValueError:
+        exit("Error: invalid password length.")
 
     # misc validation
     if allSets and length < len(charsets):
@@ -141,7 +148,6 @@ def parse_arguments():
     # return all settings
     return {
         "charsets": charsets,
-        "length": length,
         "allSets": allSets,
         "noRepeat": noRepeat,
         "groupSize": groupSize,
@@ -153,6 +159,7 @@ def parse_arguments():
         "unicode": unicode,
         "printSettings": printSettings,
         "printAlphabet": printAlphabet,
+        "length": length,
     }
 
 def print_settings(settings):
