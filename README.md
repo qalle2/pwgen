@@ -24,7 +24,7 @@ Syntax: [*options*] *length*
   * No password will contain more than two repeated characters. For example, the program may still output `password` but not `passsword` (with three esses).
 * `-g` *group_size*, `--group-size`=*group_size*
   * Print passwords in groups of *group_size* characters, separated by spaces.
-  * For example, `password` will be printed as `pass&nbsp;word` if *group_size* is 4.
+  * For example, `password` will be printed as `pass word` if *group_size* is 4.
   * Does not affect how the passwords are generated.
   * Good if long passwords must be typed instead of copied and pasted.
   * *group_size* is an integer:
