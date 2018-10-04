@@ -3,81 +3,6 @@ import secrets
 import string
 import sys
 
-DEFAULT_UNICODE = "a1-ac,ae-ff"
-
-HELP_TEXT = """\
-Password generator by Kalle (http://qalle.net)
-
-Arguments (all optional):
-    -h, -?, --help
-        Print help and exit.
-    -c X, --character-sets=X
-        Character sets to use in passwords.
-        X consists of one or more of the following, in any order:
-            u   uppercase letters (see the --uppercase option)
-            l   lowercase letters (see the --lowercase option)
-            d   digits (see the --digits option)
-            p   punctuation (see the --punctuation option)
-            n   Unicode characters (see the --unicode option)
-        Default: uldp
-    -l X, --length=X
-        Length of passwords.
-        X is a positive integer. Default: 16
-    -a, --all-sets
-        Each password will contain at least one character from each set
-        specified by the -c/--character-sets option.
-    -r, --no-repeat
-        No password will contain more than two repeated characters.
-        For example, "password" will still be valid but "passsword" (with
-        three esses) will not.
-    -g X, --group-size=X
-        Print passwords in groups of X characters, separated by spaces.
-        Does not affect how passwords are generated. Good if the passwords
-        must be typed instead of copied and pasted.
-        X is a nonnegative integer. 0 means no grouping. Default: 0
-    -n X, --number=X
-        Number of passwords to generate.
-        The passwords are generated independently of each other.
-        X is a positive integer. Default: 1
-    --uppercase=X
-        Define the set of uppercase letters. (You may not want I or O, for
-        example.)
-        X is one or more characters.
-        Default: {defaultUppercase:s}
-    --lowercase=X
-        Define the set of lowercase letters. (You may not want l or o, for
-        example.)
-        X is one or more characters.
-        Default: {defaultLowercase:s}
-    --digits=X
-        Define the set of digits. (You may not want 0 or 1, for example.)
-        X is one or more characters.
-        Default: {defaultDigits:s}
-    --punctuation=X
-        Define the set of punctuation characters. (You may not want those
-        missing from your mobile device's keyboard, for example.)
-        X is one or more characters.
-        Default: {defaultPunctuation:s}
-    --unicode=X
-        Define the set of Unicode characters.
-        X is one or more hexadecimal Unicode codepoints or ranges,
-        separated by commas. Each range consists of the first codepoint
-        and the last codepoint, separated by a hyphen. Codepoints are 0
-        to 10ffff.
-        Default: {defaultUnicode:s}
-    --settings
-        Print all settings and exit. (For debugging purposes.)
-    --alphabet
-        Print all characters to be used in passwords and exit. (For
-        debugging purposes.)\
-""".format(
-    defaultUppercase = string.ascii_uppercase,
-    defaultLowercase = string.ascii_lowercase,
-    defaultDigits = string.digits,
-    defaultPunctuation = string.punctuation,
-    defaultUnicode = DEFAULT_UNICODE,
-)
-
 def parse_argument(opts, argument1, argument2):
     """Parse getopt argument.
         opts: from getopt
@@ -153,7 +78,7 @@ def parse_codepoint_range(range_):
 def parse_unicode_argument(opts):
     """Parse --unicode argument.
     return: characters in a frozenset"""
-    ranges = opts.get("--unicode", DEFAULT_UNICODE)
+    ranges = opts.get("--unicode", "a1-ac,ae-ff")
     if len(ranges) == 0:
         exit("Error: empty list of Unicode codepoints/ranges.")
     chars = set()
@@ -163,7 +88,6 @@ def parse_unicode_argument(opts):
 
 def parse_arguments():
     longOptions = [
-        "help",
         "character-sets=",
         "length=",
         "all-sets",
@@ -179,16 +103,15 @@ def parse_arguments():
         "alphabet",
     ]
     try:
-        (opts, args) = getopt.getopt(sys.argv[1:], "h?c:l:arg:n:", longOptions)
+        (opts, args) = getopt.getopt(sys.argv[1:], "c:l:arg:n:", longOptions)
     except getopt.GetoptError:
-        exit("Error: unrecognized argument. Try -h for help.")
+        exit("Error: unrecognized argument. See the readme file.")
     if len(args) > 0:
-        exit("Error: unrecognized argument. Try -h for help.")
+        exit("Error: invalid number of arguments. See the readme file.")
 
     opts = dict(opts)
 
     # parse boolean arguments
-    printHelp = "-h" in opts or "-?" in opts or "--help" in opts
     allSets = "-a" in opts or "--all-sets" in opts
     noRepeat = "-r" in opts or "--no-repeat" in opts
     printSettings = "--settings" in opts
@@ -217,7 +140,6 @@ def parse_arguments():
 
     # return all settings
     return {
-        "printHelp": printHelp,
         "charsets": charsets,
         "length": length,
         "allSets": allSets,
@@ -309,9 +231,6 @@ def format_password(password, groupSize):
 
 def main():
     settings = parse_arguments()
-    if settings["printHelp"]:
-        print(HELP_TEXT)
-        exit()
     if settings["printSettings"]:
         print_settings(settings)
         exit()
