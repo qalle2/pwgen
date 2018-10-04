@@ -3,91 +3,36 @@ import secrets
 import string
 import sys
 
-def parse_argument(opts, argument1, argument2):
-    """Parse getopt argument.
-        opts: from getopt
-        argument1: name (e.g. "--number")
-        argument2: alternative name (e.g. "-n") or None
-    If argument is not given, return None.
-    If argument is given and empty, exit.
-    If argument is given and not empty, return it."""
-    value = opts.get(argument1)
-    if value is None and argument2 is not None:
-        value = opts.get(argument2)
-    if value is not None and len(value) == 0:
-        exit("Error: invalid value for the {:s}{:s} option.".format(
-            argument1, ("" if argument2 is None else "/" + argument2)
-        ))
-    return value
-
-def parse_string_argument(opts, argument1, argument2, default):
-    """Parse getopt string argument.
-        opts: from getopt
-        argument1: name (e.g. "--text")
-        argument2: alternative name (e.g. "-t") or None
-        default: str
-    If argument is not given, return default as frozenset.
-    If argument is given and empty, exit.
-    If argument is given and not empty, return it as frozenset."""
-    value = parse_argument(opts, argument1, argument2)
-    return frozenset(default if value is None else value)
-
-def parse_integer_argument(opts, argument1, argument2, minimum, default):
-    """Parse getopt argument.
-        opts: from getopt
-        argument1: name (e.g. "--number")
-        argument2: alternative name (e.g. "-n") or None
-        minimum: int
-        default: int
-    If argument is not given, return default.
-    If argument is given and invalid, exit.
-    If argument is given and valid, return it."""
-    value = parse_argument(opts, argument1, argument2)
-    if value is None:
-        return default
-    try:
-        value = int(value, 10)
-    except ValueError:
-        exit("Error: value is not an integer.")
-    if value < minimum:
-        exit("Error: integer value is too small.")
-    return value
-
 def parse_codepoint(codepoint):
-    """Parse a hexadecimal codepoint (str)."""
+    """Parse a hexadecimal Unicode codepoint."""
+
     try:
         codepoint = int(codepoint, 16)
         if not 0x0 <= codepoint <= 0x10ffff:
-            exit("Error: Unicode codepoint out of range.")
+            raise ValueError
     except ValueError:
-        exit("Error: Unicode codepoint is not a hexadecimal integer.")
+        exit("Error: invalid Unicode codepoint.")
     return codepoint
 
 def parse_codepoint_range(range_):
-    """Parse a hexadecimal codepoint or a range (str).
-    return: codepoints in an iterable"""
-    if len(range_) == 0:
-        exit("Error: empty Unicode codepoint/range.")
-    codepoints = tuple(parse_codepoint(part) for part in range_.split("-"))
-    if len(codepoints) == 1:
-        return (codepoints[0],)
-    if len(codepoints) == 2 and codepoints[0] <= codepoints[1]:
-        return range(codepoints[0], codepoints[1] + 1)
-    exit("Error: invalid Unicode codepoint/range.")
+    """Parse a hexadecimal Unicode codepoint or a range.
+    Return the codepoints in an iterable."""
 
-def parse_unicode_argument(opts):
-    """Parse --unicode argument.
-    return: characters in a frozenset"""
-    ranges = opts.get("--unicode", "a1-ac,ae-ff")
-    if len(ranges) == 0:
-        exit("Error: empty list of Unicode codepoints/ranges.")
-    chars = set()
-    for range_ in ranges.split(","):
-        chars.update(chr(cp) for cp in parse_codepoint_range(range_))
-    return frozenset(chars)
+    items = range_.split("-")
+    if len(items) == 1:
+        cp = parse_codepoint(items[0])
+        return (cp,)
+    if len(items) == 2:
+        cp1 = parse_codepoint(items[0])
+        cp2 = parse_codepoint(items[1])
+        if cp1 <= cp2:
+            return range(cp1, cp2 + 1)
+    exit("Error: invalid Unicode codepoint or range.")
 
 def parse_arguments():
-    longOptions = [
+    """Parse command line arguments using getopt."""
+
+    longOptions = (
         "character-sets=",
         "all-sets",
         "no-repeat",
@@ -98,52 +43,79 @@ def parse_arguments():
         "digits=",
         "punctuation=",
         "unicode=",
-        "settings",
         "alphabet",
-    ]
+    )
     try:
         (opts, args) = getopt.getopt(sys.argv[1:], "c:arg:n:", longOptions)
     except getopt.GetoptError:
-        exit("Error: unrecognized argument. See the readme file.")
+        exit("Error: invalid argument. See the readme file.")
 
     opts = dict(opts)
 
-    # parse boolean options
+    # boolean options
     allSets = "-a" in opts or "--all-sets" in opts
     noRepeat = "-r" in opts or "--no-repeat" in opts
-    printSettings = "--settings" in opts
     printAlphabet = "--alphabet" in opts
 
-    # parse integer options
-    groupSize = parse_integer_argument(opts, "--group-size", "-g", 0, 0)
-    number = parse_integer_argument(opts, "--number", "-n", 1, 1)
+    # group size
+    groupSize = opts.get("--group-size", opts.get("-g", "0"))
+    try:
+        groupSize = int(groupSize, 10)
+        if groupSize < 0:
+            raise ValueError
+    except ValueError:
+        exit("Error: invalid group size.")
 
-    # parse string options
-    charsets = parse_string_argument(opts, "--character-sets", "-c", "uldp")
-    uppercase = parse_string_argument(opts, "--uppercase", None, string.ascii_uppercase)
-    lowercase = parse_string_argument(opts, "--lowercase", None, string.ascii_lowercase)
-    digits = parse_string_argument(opts, "--digits", None, string.digits)
-    punctuation = parse_string_argument(opts, "--punctuation", None, string.punctuation)
+    # number of passwords
+    number = opts.get("--number", opts.get("-n", "1"))
+    try:
+        number = int(number, 10)
+        if number < 1:
+            raise ValueError
+    except ValueError:
+        exit("Error: invalid number of passwords.")
 
-    # parse Unicode option
-    unicode = parse_unicode_argument(opts)
+    # character sets
+    charsets = frozenset(opts.get("--character-sets", opts.get("-c", "uldp")))
+    if len(charsets - frozenset("uldpn")) > 0:
+        exit("Error: unknown character set.")
 
-    # parse length
+    # uppercase letters
+    uppercase = frozenset(opts.get("--uppercase", string.ascii_uppercase))
+    if len(uppercase) == 0:
+        exit("Error: no uppercase letters.")
+
+    # lowercase letters
+    lowercase = frozenset(opts.get("--lowercase", string.ascii_lowercase))
+    if len(lowercase) == 0:
+        exit("Error: no lowercase letters.")
+
+    # digits
+    digits = frozenset(opts.get("--digits", string.digits))
+    if len(digits) == 0:
+        exit("Error: no digits.")
+
+    # punctuation
+    punctuation = frozenset(opts.get("--punctuation", string.punctuation))
+    if len(punctuation) == 0:
+        exit("Error: no punctuation characters.")
+
+    # Unicode characters
+    ranges_ = opts.get("--unicode", "a1-ac,ae-ff")
+    unicode = set()
+    for range_ in ranges_.split(","):
+        unicode.update(chr(cp) for cp in parse_codepoint_range(range_))
+
+    # password length
     if len(args) != 1:
         exit("Error: invalid number of arguments. See the readme file.")
     length = args[0]
     try:
         length = int(length, 10)
-        if length < 1:
+        if length < 1 or (allSets and length < len(charsets)):
             raise ValueError
     except ValueError:
         exit("Error: invalid password length.")
-
-    # misc validation
-    if allSets and length < len(charsets):
-        exit("Error: passwords must be longer to satisfy requirements.")
-    if len(charsets - frozenset("uldpn")) > 0:
-        exit("Error: unknown character set.")
 
     # return all settings
     return {
@@ -157,19 +129,9 @@ def parse_arguments():
         "digits": digits,
         "punctuation": punctuation,
         "unicode": unicode,
-        "printSettings": printSettings,
         "printAlphabet": printAlphabet,
         "length": length,
     }
-
-def print_settings(settings):
-    """Print all settings."""
-    for key in sorted(settings):
-        try:
-            value = sorted(settings[key])
-        except TypeError:
-            value = settings[key]
-        print("{:s}: {!s}".format(key, value))
 
 def get_selected_charsets(settings):
     """Yield contents of each selected character set."""
@@ -238,9 +200,6 @@ def format_password(password, groupSize):
 
 def main():
     settings = parse_arguments()
-    if settings["printSettings"]:
-        print_settings(settings)
-        exit()
     if settings["printAlphabet"]:
         print("".join(sorted(create_alphabet(settings))))
         exit()
