@@ -5,7 +5,9 @@ Developed with Python 3 under 64-bit Windows.
 
 ## Command line arguments
 
-All arguments are optional.
+Syntax: [*options*] *length*
+
+### Options
 
 * `-c` *sets* or `--character-sets`=*sets*
   * Which character sets to use in passwords.
@@ -16,12 +18,6 @@ All arguments are optional.
     * `p`: punctuation (see `--punctuation`)
     * `n`: Unicode characters (see `--unicode`)
   * default: `uldp`
-* `-l` *length* or `--length`=*length*
-  * How many characters to use in each password.
-  * *length* is an integer:
-    * minimum: 1
-    * default: 16
-    * maximum: no limit
 * `-a` or `--all-sets`
   * Each password will contain at least one character from each set specified by the `-c` or `--character-sets` option.
 * `-r` or `--no-repeat`
@@ -71,23 +67,29 @@ All arguments are optional.
     * Print all characters to be used in passwords and exit.
     * for debugging purposes
 
+### *length*
+* How many characters to use in each password.
+* *length* is an integer:
+    * minimum: 1
+    * maximum: no limit
+
 ## Examples
 
 Generate four ASCII passwords of length 10 with at least one uppercase letter, lowercase letter, digit and punctuation character in each one:
 ```
-python pwgen.py --character-sets=uldp --all-sets --length=10 --number=4
-8*w/oD\dI%
-l3?+Uv1yor
-U[h5yWT4^`
-x!^'Wr-:2=
+python pwgen.py --character-sets=uldp --all-sets --number=4 10
+]-Cy8cu}pj
+8K!O)auxzv
+;u2b%0P~W_
+e*?@KypZ8=
 ```
 
 Generate five passwords of length 20 using *Unicode Miscellaneous Symbols and Pictographs* except `PILE OF POO`:
 ```
-python pwgen.py --character-sets=n --unicode=1f300-1f4a8,1f4aa-1f5ff --length=20 --number=5
-🐸🌷🏕🏬🌂🌋🕏📋💖🔁🏐🌆🖮🍲👉🕦📅🐕🖖🍨
-📊📰🖊🍓🍹👛👒👖🐇💍🔔💃🏅🕺👯🐅👪🕟🔽🗸
-👰🔋🕑👖🖎👶🔹📞🗴🎩👰🕈🗡📕🎀🖓🍃🔐💝💴
-🗄📌🕠🖔🍽🐱🎏🍒🐏👆🔧🔼👐🔈🐲🌣🖰💎🕜💪
-🎞💯🔱🍋💼🌾🖣🌻🐨🖘👯🍐🐺🏶🖥🕧🖣🕘🖖🕐
+python pwgen.py --character-sets=n --unicode=1f300-1f4a8,1f4aa-1f5ff --number=5 20
+🌈🍐🕾🏊🐗🕯🕎🐮🍠📮🎘💘🖚💟🎿🔪👼🖑🎈🏒
+🎕🌡🌿🗊📯🐟🍾🎪🔭📠🔔🔉👠🏱🌍💰🕪👥🎜🗄
+🕯🐿🏻🕔🌧📇🕼📦💄🎽🕓🕴🖡🕀🐥🍇🕄🌦🐎🌩
+📡🔊🗂🍋🖋🎨🗼🌈👽🖝📘💨🎣🍟🍇🌦📼🌴📋🌫
+🎡🐝🎑🌸🔝🌻🎁🖃🗽🐾🏩🍕📫🖰🍦🍬🐨🌏🕣🐸
 ```
