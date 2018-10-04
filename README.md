@@ -60,9 +60,9 @@ Syntax: [*options*] *length*
     * Each range consists of the first codepoint and the last codepoint, separated by a hyphen (`-`).
     * codepoints: `0` to `10ffff`
   * default: `a1-ac,ae-ff`
-  * `--alphabet`
-    * Do not generate passwords; just print all characters to be used in them and exit.
-    * requires a dummy value for *length* (see below)
+* `--alphabet`
+  * Do not generate passwords; just print all characters to be used in them and exit.
+  * requires a dummy value for *length* (see below)
 
 ### *length*
 * How many characters to use in each password.
