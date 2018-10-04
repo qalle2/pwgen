@@ -3,36 +3,83 @@ Password generator in Python.
 Uses the cryptographically strong [``secrets``](http://docs.python.org/3/library/secrets.html) module.
 Developed with Python 3 under 64-bit Windows.
 
-For help, use the `-h` argument: `python pwgen.py -h`
+## Command line arguments
 
-## Example 1
+All arguments are optional.
 
-Generate four ASCII passwords of length 10 with at least one uppercase letter, lowercase letter, digit and punctuation character in each one.
+### `-c` *sets* or `--character-sets`=*sets*
+*sets* are the character sets to use in the passwords, i.e., one or more of the following, in any order:
+* `u`: uppercase letters (see `--uppercase`)
+* `l`: lowercase letters (see `--lowercase`)
+* `d`: digits (see `--digits`)
+* `p`: punctuation (see `--punctuation`)
+* `n`: Unicode characters (see `--unicode`)
 
-### Input
+Default: `uldp`
 
-`python pwgen.py --character-sets=uldp --all-sets --length=10 --number=4`
+### `-l` *length* or `--length`=*length*
+*length* is the number of characters in each password. It is an integer:
+* minimum: 1
+* default: 16
+* maximum: no limit
 
-### Output
+### `-a` or `--all-sets`
+Each password will contain at least one character from each set specified by the `-c` or `--character-sets` option.
 
+### `-r` or `--no-repeat`
+No password will contain more than two repeated characters. For example, the program may still output `password` but not `passsword` (with three esses).
+
+### `-g` *group_size*, `--group-size`=*group_size*
+Print passwords in groups of *group_size* characters, separated by spaces. For example, `password` will be printed as `pass&nbsp;word` if *group_size* is 4. Does not affect how the passwords are generated. Good if long passwords must be typed instead of copied and pasted.
+
+*group_size* is an integer:
+* minimum: 0 (no grouping)
+* default: 0
+* maximum: no limit
+    
+### `-n` *count*, `--number`=*count*
+*count* is the number of passwords to generate. The passwords will be generated independently of each other.
+
+*count* is an integer:
+* minimum: 1
+* default: 1
+* maximum: no limit
+
+### `--uppercase`=*characters*
+Define the set of uppercase letters. *characters* is one or more characters. Default: `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+
+### `--lowercase`=*characters*
+Define the set of lowercase letters. *characters* is one or more characters. Default: `abcdefghijklmnopqrstuvwxyz`
+
+### `--digits`=*characters*
+Define the set of digits. *characters* is one or more characters. Default: `0123456789`
+
+### `--punctuation`=*characters*
+Define the set of punctuation characters. *characters* is one or more characters. Default: ```!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~```
+
+### `--unicode`=*codepoints*
+Define the set of Unicode characters. *codepoints* is one or more hexadecimal Unicode codepoints or ranges, separated by commas (`,`). Each range consists of the first codepoint and the last codepoint, separated by a hyphen (`-`). Codepoints are `0` to `10ffff`. Default: `a1-ac,ae-ff`
+
+### `--settings`
+Print all settings and exit. (For debugging purposes.)
+
+### `--alphabet`
+Print all characters to be used in passwords and exit. (For debugging purposes.)
+
+## Examples
+
+Generate four ASCII passwords of length 10 with at least one uppercase letter, lowercase letter, digit and punctuation character in each one:
 ```
+python pwgen.py --character-sets=uldp --all-sets --length=10 --number=4
 8*w/oD\dI%
 l3?+Uv1yor
 U[h5yWT4^`
 x!^'Wr-:2=
 ```
 
-## Example 2
-
-Generate five passwords of length 20 using *Unicode Miscellaneous Symbols and Pictographs* except `PILE OF POO`.
-
-### Input
-
-`python pwgen.py --character-sets=n --unicode=1f300-1f4a8,1f4aa-1f5ff --length=20 --number=5`
-
-### Output
-
+Generate five passwords of length 20 using *Unicode Miscellaneous Symbols and Pictographs* except `PILE OF POO`:
 ```
+python pwgen.py --character-sets=n --unicode=1f300-1f4a8,1f4aa-1f5ff --length=20 --number=5
 🐸🌷🏕🏬🌂🌋🕏📋💖🔁🏐🌆🖮🍲👉🕦📅🐕🖖🍨
 📊📰🖊🍓🍹👛👒👖🐇💍🔔💃🏅🕺👯🐅👪🕟🔽🗸
 👰🔋🕑👖🖎👶🔹📞🗴🎩👰🕈🗡📕🎀🖓🍃🔐💝💴
