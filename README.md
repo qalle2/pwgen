@@ -7,7 +7,7 @@ Developed with Python 3 under 64-bit Windows.
 
 Syntax: [*options*] *length*
 
-### Options
+### *options*
 
 * `-c` *sets* or `--character-sets`=*sets*
   * Which character sets to use in passwords.
@@ -60,12 +60,9 @@ Syntax: [*options*] *length*
     * Each range consists of the first codepoint and the last codepoint, separated by a hyphen (`-`).
     * codepoints: `0` to `10ffff`
   * default: `a1-ac,ae-ff`
-  * `--settings`
-    * Print all settings and exit.
-    * for debugging purposes
   * `--alphabet`
-    * Print all characters to be used in passwords and exit.
-    * for debugging purposes
+    * Do not generate passwords; just print all characters to be used in them and exit.
+    * requires a dummy value for *length* (see below)
 
 ### *length*
 * How many characters to use in each password.
@@ -78,18 +75,24 @@ Syntax: [*options*] *length*
 Generate four ASCII passwords of length 10 with at least one uppercase letter, lowercase letter, digit and punctuation character in each one:
 ```
 python pwgen.py --character-sets=uldp --all-sets --number=4 10
-]-Cy8cu}pj
-8K!O)auxzv
-;u2b%0P~W_
-e*?@KypZ8=
+IW=6i-\TzL
+UfH!`ZvHa6
+48*fX#|[~d
+qUD3dOH0!c
 ```
 
 Generate five passwords of length 20 using *Unicode Miscellaneous Symbols and Pictographs* except `PILE OF POO`:
 ```
 python pwgen.py --character-sets=n --unicode=1f300-1f4a8,1f4aa-1f5ff --number=5 20
-🌈🍐🕾🏊🐗🕯🕎🐮🍠📮🎘💘🖚💟🎿🔪👼🖑🎈🏒
-🎕🌡🌿🗊📯🐟🍾🎪🔭📠🔔🔉👠🏱🌍💰🕪👥🎜🗄
-🕯🐿🏻🕔🌧📇🕼📦💄🎽🕓🕴🖡🕀🐥🍇🕄🌦🐎🌩
-📡🔊🗂🍋🖋🎨🗼🌈👽🖝📘💨🎣🍟🍇🌦📼🌴📋🌫
-🎡🐝🎑🌸🔝🌻🎁🖃🗽🐾🏩🍕📫🖰🍦🍬🐨🌏🕣🐸
+🍎🍪🗾🖦🌻🏷🎿🏃🍻🐃📙🕀🌜🎰🏲💃🖵🗋🍦🎄
+🔵🏿🐳🖩🗸🔁💼🐣🐵🍲🌬🏜🔞🗩🎶🏢🔬🕽🍶📭
+🕫💌🍤🏫🍅🌅🔜🖻💼🎘🐿🖫🕑🌅🔿🕜🎮🖵🍎📅
+🗎🐛💴🗰🌉🗽👇🌦🍟🍔🖣👹🌈💤💠🕍🔗🔬🖃🌑
+🌨🔘🎹🔃📎🕀🔂🖏🌎🏉🍶💁👷🐋🖫💢🍣🎰🕚🗨
+```
+
+Print the default character set and exit:
+```
+python pwgen.py --alphabet 1
+!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
 ```
