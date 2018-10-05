@@ -20,8 +20,6 @@ Syntax: [*options*] *length*
   * default: `uldp`
 * `-a` or `--all-sets`
   * Each password will contain at least one character from each set specified by the `-c` or `--character-sets` option.
-* `-r` or `--no-repeat`
-  * No password will contain more than two repeated characters. For example, the program may still output `password` but not `passsword` (with three esses).
 * `-g` *group_size*, `--group-size`=*group_size*
   * Print passwords in groups of *group_size* characters, separated by spaces.
   * For example, `password` will be printed as `pass word` if *group_size* is 4.
