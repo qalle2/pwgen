@@ -9,7 +9,7 @@ Syntax: [*options*] *length*
 
 ### *options*
 
-* `-c` *sets* or `--character-sets`=*sets*
+* `-s` *sets* or `--character-sets`=*sets*
   * Which character sets to use in passwords.
   * *sets* is one or more of the following, in any order:
     * `u`: uppercase letters (see `--uppercase`)
@@ -20,47 +20,44 @@ Syntax: [*options*] *length*
   * default: `uldp`
 * `-a` or `--all-sets`
   * Each password will contain at least one character from each set specified by the `-c` or `--character-sets` option.
-* `-g` *group_size*, `--group-size`=*group_size*
-  * Print passwords in groups of *group_size* characters, separated by spaces.
-  * For example, `password` will be printed as `pass word` if *group_size* is 4.
+* `-g` *length*, `--group-size`=*length*
+  * Print passwords in groups of *length* characters, separated by spaces.
+  * For example, `password` will be printed as `pass word` if *length* is 4.
   * Does not affect how the passwords are generated.
   * Good if long passwords must be typed instead of copied and pasted.
-  * *group_size* is an integer:
+  * *length* is an integer:
     * minimum: 0 (no grouping)
     * default: 0
     * maximum: no limit
-* `-n` *count*, `--number`=*count*
+* `-c` *count*, `--count`=*count*
   * How many passwords to generate.
   * *count* is an integer:
     * minimum: 1
     * default: 1
     * maximum: no limit
   * The passwords will be generated independently of each other.
-* `--uppercase`=*characters*
+* `-u` *characters*, `--uppercase`=*characters*
   * Define the set of uppercase letters.
   * *characters* is one or more characters.
   * default: `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-* `--lowercase`=*characters*
+* `-l` *characters*, `--lowercase`=*characters*
   * Define the set of lowercase letters.
   * *characters* is one or more characters.
   * default: `abcdefghijklmnopqrstuvwxyz`
-* `--digits`=*characters*
+* `-d` *characters*, `--digits`=*characters*
   * Define the set of digits.
   * *characters* is one or more characters.
   * default: `0123456789`
-* `--punctuation`=*characters*
+* `-p` *characters*, `--punctuation`=*characters*
   * Define the set of punctuation characters.
   * *characters* is one or more characters.
   * default: ```!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~```
-* `--unicode`=*codepoints*
+* `-n` *characters*, `--unicode`=*codepoints*
   * Define the set of Unicode codepoints.
   * *codepoints* is one or more hexadecimal Unicode codepoints or ranges, separated by commas (`,`).
     * Each range consists of the first codepoint and the last codepoint, separated by a hyphen (`-`).
     * codepoints: `0` to `10ffff`
   * default: `a1-ac,ae-ff`
-* `--alphabet`
-  * Do not generate passwords; just print all characters to be used in them and exit.
-  * requires a dummy value for *length* (see below)
 
 ### *length*
 * How many characters to use in each password.
@@ -70,27 +67,21 @@ Syntax: [*options*] *length*
 
 ## Examples
 
-Generate four ASCII passwords of length 10 with at least one uppercase letter, lowercase letter, digit and punctuation character in each one:
+Generate four alphanumeric ASCII passwords of length 10 with at least one uppercase letter, lowercase letter and digit:
 ```
-python pwgen.py --character-sets=uldp --all-sets --number=4 10
-IW=6i-\TzL
-UfH!`ZvHa6
-48*fX#|[~d
-qUD3dOH0!c
+python pwgen.py -s uld -a -c 4 10
+By6XDrddbW
+C6USrm54jj
+2frG5TUctI
+KQS4gqz3KC
 ```
 
 Generate five passwords of length 20 using *Unicode Miscellaneous Symbols and Pictographs* except `PILE OF POO`:
 ```
-python pwgen.py --character-sets=n --unicode=1f300-1f4a8,1f4aa-1f5ff --number=5 20
-🍎🍪🗾🖦🌻🏷🎿🏃🍻🐃📙🕀🌜🎰🏲💃🖵🗋🍦🎄
-🔵🏿🐳🖩🗸🔁💼🐣🐵🍲🌬🏜🔞🗩🎶🏢🔬🕽🍶📭
-🕫💌🍤🏫🍅🌅🔜🖻💼🎘🐿🖫🕑🌅🔿🕜🎮🖵🍎📅
-🗎🐛💴🗰🌉🗽👇🌦🍟🍔🖣👹🌈💤💠🕍🔗🔬🖃🌑
-🌨🔘🎹🔃📎🕀🔂🖏🌎🏉🍶💁👷🐋🖫💢🍣🎰🕚🗨
-```
-
-Print the default character set and exit:
-```
-python pwgen.py --alphabet 1
-!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+python pwgen.py --character-sets=n --unicode=1f300-1f4a8,1f4aa-1f5ff --count=5 20
+📦🐾🎃🍞💛🍜🕺🐧🏭👹🗴📊🕟🎵🌣🖟🔦💑🍩🍾
+🍯💅🖼🍠🔪🖰🔥🕂🗃🌥👧🍤🌏🖡🗽💰🐥🕹🖧📕
+🌭🍾💃🍗🔥🖬🗜💮🗧🗿👮🎛📺🕽💮🗻🕱🔍🐝🏌
+🔓🐄🐻🎧🔴🗺🕵🌁🔝🌢🍬🐸🏭🖍🗃🖶🕗👂👅🍻
+🍿👘🍆🔭🖠🎮🗛🍅🎚🔍🖂👲📎🏮💨💋🏠👦👯🐃
 ```
