@@ -12,14 +12,14 @@ Syntax: [*options*] *length*
 * `-s` *sets* or `--character-sets`=*sets*
   * Which character sets to use in passwords.
   * *sets* is one or more of the following, in any order:
-    * `u`: uppercase letters (see `--uppercase`)
-    * `l`: lowercase letters (see `--lowercase`)
-    * `d`: digits (see `--digits`)
-    * `p`: punctuation (see `--punctuation`)
-    * `n`: Unicode characters (see `--unicode`)
+    * `u`: uppercase letters (see the `-u`/`--uppercase` option)
+    * `l`: lowercase letters (see the `-l`/`--lowercase` option)
+    * `d`: digits (see the `-d`/`--digits` option)
+    * `p`: punctuation (see the `-p`/`--punctuation` option)
+    * `n`: Unicode characters (see the `-n`/`--unicode` option)
   * default: `uldp`
 * `-a` or `--all-sets`
-  * Each password will contain at least one character from each set specified by the `-c` or `--character-sets` option.
+  * Each password will contain at least one character from each set specified by the `-s`/`--character-sets` option.
 * `-g` *length*, `--group-size`=*length*
   * Print passwords in groups of *length* characters, separated by spaces.
   * For example, `password` will be printed as `pass word` if *length* is 4.
@@ -52,7 +52,7 @@ Syntax: [*options*] *length*
   * Define the set of punctuation characters.
   * *characters* is one or more characters.
   * default: ```!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~```
-* `-n` *characters*, `--unicode`=*codepoints*
+* `-n` *codepoints*, `--unicode`=*codepoints*
   * Define the set of Unicode codepoints.
   * *codepoints* is one or more hexadecimal Unicode codepoints or ranges, separated by commas (`,`).
     * Each range consists of the first codepoint and the last codepoint, separated by a hyphen (`-`).
