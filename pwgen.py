@@ -29,31 +29,73 @@ def parse_codepoint_range(range_):
             return range(cp1, cp2 + 1)
     exit("Error: invalid Unicode codepoint or range.")
 
+def parse_alphabet_arguments(opts):
+    """Get the alphabet to use (a frozenset of frozensets)."""
+
+    # which character sets to use
+    charsets = set(opts.get("--character-sets", opts.get("-s", "uldp")))
+    if not charsets or charsets - set("uldpn"):
+        exit("Error: invalid -s/--character-sets argument.")
+
+    alphabet = set()
+
+    if "u" in charsets:
+        charset = opts.get("--uppercase", opts.get("-u",
+            string.ascii_uppercase
+        ))
+        alphabet.add(frozenset(charset))
+    if "l" in charsets:
+        charset = opts.get("--lowercase", opts.get("-l",
+            string.ascii_lowercase
+        ))
+        alphabet.add(frozenset(charset))
+    if "d" in charsets:
+        charset = opts.get("--digits", opts.get("-d", string.digits))
+        alphabet.add(frozenset(charset))
+    if "p" in charsets:
+        charset = opts.get("--punctuation", opts.get("-p", string.punctuation))
+        alphabet.add(frozenset(charset))
+    if "n" in charsets:
+        charset = set()
+        for range_ in opts.get("--unicode", "a1-ac,ae-ff").split(","):
+            charset.update(chr(cp) for cp in parse_codepoint_range(range_))
+        alphabet.add(frozenset(charset))
+
+    if min(len(charset) for charset in alphabet) == 0:
+        exit("Error: a character set is empty.")
+
+    return frozenset(alphabet)
+
 def parse_arguments():
     """Parse command line arguments using getopt."""
 
+    shortOptions = "s:ag:c:u:l:d:p:n:"
     longOptions = (
         "character-sets=",
         "all-sets",
         "group-size=",
-        "number=",
+        "count=",
         "uppercase=",
         "lowercase=",
         "digits=",
         "punctuation=",
         "unicode=",
-        "alphabet",
     )
     try:
-        (opts, args) = getopt.getopt(sys.argv[1:], "c:arg:n:", longOptions)
+        (opts, args) = getopt.getopt(sys.argv[1:], shortOptions, longOptions)
     except getopt.GetoptError:
         exit("Error: invalid argument. See the readme file.")
 
+    if len(args) != 1:
+        exit("Error: invalid number of arguments. See the readme file.")
+
     opts = dict(opts)
 
-    # boolean options
+    # alphabet
+    alphabet = parse_alphabet_arguments(opts)
+
+    # at least one character from each set?
     allSets = "-a" in opts or "--all-sets" in opts
-    printAlphabet = "--alphabet" in opts
 
     # group size
     groupSize = opts.get("--group-size", opts.get("-g", "0"))
@@ -65,125 +107,56 @@ def parse_arguments():
         exit("Error: invalid group size.")
 
     # number of passwords
-    number = opts.get("--number", opts.get("-n", "1"))
+    count = opts.get("--count", opts.get("-c", "1"))
     try:
-        number = int(number, 10)
-        if number < 1:
+        count = int(count, 10)
+        if count < 1:
             raise ValueError
     except ValueError:
         exit("Error: invalid number of passwords.")
 
-    # character sets
-    charsets = frozenset(opts.get("--character-sets", opts.get("-c", "uldp")))
-    if len(charsets - frozenset("uldpn")) > 0:
-        exit("Error: unknown character set.")
-
-    # uppercase letters
-    uppercase = frozenset(opts.get("--uppercase", string.ascii_uppercase))
-    if len(uppercase) == 0:
-        exit("Error: no uppercase letters.")
-
-    # lowercase letters
-    lowercase = frozenset(opts.get("--lowercase", string.ascii_lowercase))
-    if len(lowercase) == 0:
-        exit("Error: no lowercase letters.")
-
-    # digits
-    digits = frozenset(opts.get("--digits", string.digits))
-    if len(digits) == 0:
-        exit("Error: no digits.")
-
-    # punctuation
-    punctuation = frozenset(opts.get("--punctuation", string.punctuation))
-    if len(punctuation) == 0:
-        exit("Error: no punctuation characters.")
-
-    # Unicode characters
-    ranges_ = opts.get("--unicode", "a1-ac,ae-ff")
-    unicode = set()
-    for range_ in ranges_.split(","):
-        unicode.update(chr(cp) for cp in parse_codepoint_range(range_))
-
     # password length
-    if len(args) != 1:
-        exit("Error: invalid number of arguments. See the readme file.")
     length = args[0]
     try:
         length = int(length, 10)
-        if length < 1 or (allSets and length < len(charsets)):
+        if length < 1 or (allSets and length < len(alphabet)):
             raise ValueError
     except ValueError:
         exit("Error: invalid password length.")
 
-    # return all settings
     return {
-        "charsets": charsets,
+        "alphabet": alphabet,
         "allSets": allSets,
         "groupSize": groupSize,
-        "number": number,
-        "uppercase": uppercase,
-        "lowercase": lowercase,
-        "digits": digits,
-        "punctuation": punctuation,
-        "unicode": unicode,
-        "printAlphabet": printAlphabet,
+        "count": count,
         "length": length,
     }
 
-def get_selected_charsets(settings):
-    """Yield contents of each selected character set."""
-    for (charset, contents) in (
-        ("u", "uppercase"),
-        ("l", "lowercase"),
-        ("d", "digits"),
-        ("p", "punctuation"),
-        ("n", "unicode"),
-    ):
-        if charset in settings["charsets"]:
-            yield settings[contents]
-
-def create_alphabet(settings):
-    """Get a list of all characters in selected sets."""
-    alphabet = set()
-    for charset in get_selected_charsets(settings):
-        alphabet.update(charset)
-    return list(alphabet)
-
-def validate_password(password, settings):
-    """Return True if password is valid or False if it is not."""
-
-    if settings["allSets"]:
-        # reject if there is not at least one character from each set
-        uniqueChars = frozenset(password)
-        if any(
-            charset.isdisjoint(uniqueChars)
-            for charset in get_selected_charsets(settings)
-        ):
-            return False
-
-    # accept
-    return True
-
 def generate_password(settings):
-    """http://docs.python.org/3/library/secrets.html#recipes-and-best-practices
+    """
+    http://docs.python.org/3/library/secrets.html#recipes-and-best-practices
     """
 
-    alphabet = create_alphabet(settings)
-
-    # generate passwords until one passes the tests
+    # create the alphabet
+    alphabet = set()
+    for charset in settings["alphabet"]:
+        alphabet.update(charset)
+    alphabet = tuple(alphabet)
+    # generate a valid password
     while True:
         password = "".join(
             secrets.choice(alphabet) for i in range(settings["length"])
         )
-        if validate_password(password, settings):
+        if not settings["allSets"] or all(
+            charset & frozenset(password) for charset in settings["alphabet"]
+        ):
             return password
 
 def format_password(password, groupSize):
-    """Return password with its characters grouped."""
+    """Return the password with its characters grouped."""
 
     if groupSize == 0:
         return password
-
     return " ".join(
         password[pos:pos+groupSize]
         for pos in range(0, len(password), groupSize)
@@ -191,11 +164,7 @@ def format_password(password, groupSize):
 
 def main():
     settings = parse_arguments()
-    if settings["printAlphabet"]:
-        print("".join(sorted(create_alphabet(settings))))
-        exit()
-
-    for i in range(settings["number"]):
+    for i in range(settings["count"]):
         password = generate_password(settings)
         print(format_password(password, settings["groupSize"]))
 
