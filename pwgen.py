@@ -35,7 +35,6 @@ def parse_arguments():
     longOptions = (
         "character-sets=",
         "all-sets",
-        "no-repeat",
         "group-size=",
         "number=",
         "uppercase=",
@@ -54,7 +53,6 @@ def parse_arguments():
 
     # boolean options
     allSets = "-a" in opts or "--all-sets" in opts
-    noRepeat = "-r" in opts or "--no-repeat" in opts
     printAlphabet = "--alphabet" in opts
 
     # group size
@@ -121,7 +119,6 @@ def parse_arguments():
     return {
         "charsets": charsets,
         "allSets": allSets,
-        "noRepeat": noRepeat,
         "groupSize": groupSize,
         "number": number,
         "uppercase": uppercase,
@@ -163,12 +160,6 @@ def validate_password(password, settings):
             for charset in get_selected_charsets(settings)
         ):
             return False
-
-    if settings["noRepeat"]:
-        # reject if there are three repeated letters
-        for pos in range(0, len(password) - 2):
-            if len(set(password[pos:pos+3])) == 1:
-                return False
 
     # accept
     return True
