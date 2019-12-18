@@ -1,6 +1,6 @@
 # pwgen
 Password generator in Python.
-Uses the cryptographically strong [``secrets``](http://docs.python.org/3/library/secrets.html) module.
+Uses the cryptographically strong [``secrets``](http://docs.python.org/library/secrets.html) module.
 Developed with Python 3 under 64-bit Windows.
 
 ## Command line arguments
@@ -18,8 +18,6 @@ Syntax: [*options*] *length*
     * `p`: punctuation (see the `-p`/`--punctuation` option)
     * `n`: Unicode characters (see the `-n`/`--unicode` option)
   * default: `uldp`
-* `-a` or `--all-sets`
-  * Each password will contain at least one character from each set specified by the `-s`/`--character-sets` option.
 * `-g` *length*, `--group-size`=*length*
   * Print passwords in groups of *length* characters, separated by spaces.
   * For example, `password` will be printed as `pass word` if *length* is 4.
@@ -67,9 +65,9 @@ Syntax: [*options*] *length*
 
 ## Examples
 
-Generate four alphanumeric ASCII passwords of length 10 with at least one uppercase letter, lowercase letter and digit:
+Generate four alphanumeric ASCII passwords of length 10:
 ```
-python pwgen.py -s uld -a -c 4 10
+python pwgen.py -s uld -c 4 10
 By6XDrddbW
 C6USrm54jj
 2frG5TUctI
@@ -78,10 +76,13 @@ KQS4gqz3KC
 
 Generate five passwords of length 20 using *Unicode Miscellaneous Symbols and Pictographs* except `PILE OF POO`:
 ```
-python pwgen.py --character-sets=n --unicode=1f300-1f4a8,1f4aa-1f5ff --count=5 20
+python pwgen.py --character-sets n --unicode 1f300-1f4a8,1f4aa-1f5ff --count 5 20
 📦🐾🎃🍞💛🍜🕺🐧🏭👹🗴📊🕟🎵🌣🖟🔦💑🍩🍾
 🍯💅🖼🍠🔪🖰🔥🕂🗃🌥👧🍤🌏🖡🗽💰🐥🕹🖧📕
 🌭🍾💃🍗🔥🖬🗜💮🗧🗿👮🎛📺🕽💮🗻🕱🔍🐝🏌
 🔓🐄🐻🎧🔴🗺🕵🌁🔝🌢🍬🐸🏭🖍🗃🖶🕗👂👅🍻
 🍿👘🍆🔭🖠🎮🗛🍅🎚🔍🖂👲📎🏮💨💋🏠👦👯🐃
 ```
+
+## References
+* [Python documentation &ndash; the secrets module &ndash; Recipes and best practices](http://docs.python.org/library/secrets.html#recipes-and-best-practices)
