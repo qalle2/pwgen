@@ -30,18 +30,17 @@ def parse_arguments():
     )
     parser.add_argument(
         "--unicode", default="a1-ac,ae-ff",
-        help="A set of characters as ranges of hexadecimal Unicode codepoints (0-10ffff). A hyphen "
-        "('-') separates the first and last codepoint of a range. A comma (',') separates ranges."
+        help="Another set of additional characters as ranges of hexadecimal Unicode codepoints "
+        "(0-10ffff). A hyphen ('-') separates the first and last codepoint of a range. A comma "
+        "(',') separates ranges."
     )
 
     args = parser.parse_args()
 
     if args.length < 1:
         sys.exit("Invalid password length.")
-    if not args.sets:
-        sys.exit("Need at least one character set.")
-    if set(args.sets) - set("uldpn"):
-        sys.exit("No such a character set.")
+    if set(args.sets) - set("uldpn") or not args.sets:
+        sys.exit("Invalid character sets.")
 
     return args
 
@@ -56,7 +55,7 @@ def parse_codepoint(codepoint):
     return codepoint
 
 def parse_codepoint_range(range_):
-    # parse a hexadecimal Unicode codepoint or a range, return a range()
+    # parse a range of hexadecimal Unicode codepoints, return a range()
     items = range_.split("-")
     if len(items) != 2:
         sys.exit("Invalid codepoint range.")
@@ -66,7 +65,7 @@ def parse_codepoint_range(range_):
     return range(first, last + 1)
 
 def get_alphabet(args):
-    # get the set of characters to use in passwords
+    # get the character set to use
     alphabet = set()
     if "u" in args.sets:
         alphabet.update(args.uppercase)
@@ -78,11 +77,15 @@ def get_alphabet(args):
         alphabet.update(args.punctuation)
     if "n" in args.sets:
         for range_ in args.unicode.split(","):
-            alphabet.update(chr(codepoint) for codepoint in parse_codepoint_range(range_))
+            alphabet.update(chr(r) for r in parse_codepoint_range(range_))
     if not alphabet:
         sys.exit("No characters in selected sets.")
     return alphabet
 
-args = parse_arguments()
-alphabet = list(get_alphabet(args))
-print("".join(secrets.choice(alphabet) for i in range(args.length)))
+def main():
+    args = parse_arguments()
+    alphabet = list(get_alphabet(args))
+    print("".join(secrets.choice(alphabet) for i in range(args.length)))
+
+if __name__ == "__main__":
+    main()

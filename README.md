@@ -19,7 +19,14 @@ optional arguments:
   --punctuation PUNCTUATION
                         The set of punctuation characters. (default:
                         !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)
-  --unicode UNICODE     A set of characters as ranges of hexadecimal Unicode codepoints
-                        (0-10ffff). A hyphen ('-') separates the first and last codepoint of a
-                        range. A comma (',') separates ranges. (default: a1-ac,ae-ff)
+  --unicode UNICODE     Another set of additional characters as ranges of hexadecimal Unicode
+                        codepoints (0-10ffff). A hyphen ('-') separates the first and last
+                        codepoint of a range. A comma (',') separates ranges. (default: a1-ac,ae-
+                        ff)
+```
+
+## Example
+```
+$ python3 pwgen.py
+8nceP8Cnaw
 ```
