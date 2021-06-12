@@ -12,10 +12,10 @@ python3 pwgen.py --length 79 --sets uld --uppercase ABCDEFGHJKLMNPQRSTUVWXYZ --l
 echo
 
 echo "=== Length 79, all character sets ==="
-python3 pwgen.py --length 79 --sets uldpcn
+python3 pwgen.py --length 79 --sets uldpn
 echo
 
-echo "=== Length 79, upper case ASCII (defined as codepoints) ==="
+echo "=== Length 79, upper-case ASCII (defined as codepoints) ==="
 python3 pwgen.py --length 79 --sets n --unicode 41-5a
 echo
 
