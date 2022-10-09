@@ -1,38 +1,42 @@
 import argparse, secrets, string, sys
 
 def parse_arguments():
-    # parse command line arguments using argparse
-
-    parser = argparse.ArgumentParser(
-        description="Generate a password using the cryptographically strong secrets module.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
+    parser = argparse.ArgumentParser(description="Generate a password.")
 
     parser.add_argument(
-        "-l", "--length", type=int, default=10, help="The length of the password."
+        "-l", "--length", type=int, default=12,
+        help="The length of the password. Default=12."
     )
     parser.add_argument(
         "-s", "--sets", default="uld",
-        help="Which character sets to use in the password: u=uppercase letters, l=lowercase "
-        "letters, d=digits, p=punctuation, n=Unicode."
+        help="Which character sets to use in the password: u=uppercase "
+        "letters, l=lowercase letters, d=digits, p=punctuation, n=Unicode. "
+        "Default=uld."
     )
     parser.add_argument(
-        "--uppercase", default=string.ascii_uppercase, help="The set of uppercase letters."
+        "--uppercase", default=string.ascii_uppercase,
+        help="The set of uppercase letters. Default: all ASCII uppercase "
+        "letters."
     )
     parser.add_argument(
-        "--lowercase", default=string.ascii_lowercase, help="The set of lowercase letters."
+        "--lowercase", default=string.ascii_lowercase,
+        help="The set of lowercase letters. Default: all ASCII lowercase "
+        "letters."
     )
     parser.add_argument(
-        "--digits", default=string.digits, help="The set of digits."
+        "--digits", default=string.digits,
+        help="The set of digits. Default: all ASCII digits."
     )
     parser.add_argument(
-        "--punctuation", default=string.punctuation, help="The set of punctuation characters."
+        "--punctuation", default=string.punctuation,
+        help="The set of punctuation characters. Default: all ASCII "
+        "punctuation characters."
     )
     parser.add_argument(
         "--unicode", default="a1-ac,ae-ff",
-        help="Another set of additional characters as ranges of hexadecimal Unicode codepoints "
-        "(0-10ffff). A hyphen ('-') separates the first and last codepoint of a range. A comma "
-        "(',') separates ranges."
+        help="A set of additional characters as ranges of hexadecimal "
+        "Unicode codepoints (0-10ffff). '-' separates the first and last "
+        "codepoint of a range. ',' separates ranges. Default=a1-ac,ae-ff."
     )
 
     args = parser.parse_args()
@@ -87,5 +91,4 @@ def main():
     alphabet = list(get_alphabet(args))
     print("".join(secrets.choice(alphabet) for i in range(args.length)))
 
-if __name__ == "__main__":
-    main()
+main()
